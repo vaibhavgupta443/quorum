@@ -1,0 +1,19 @@
+Priya Nair: Let's get the vendor call on the calendar. How about Monday at 10?
+Karan: I can join that.
+Priya Nair: Great. Also, someone has to prepare the budget summary. Ananya, can you?
+Ananya: I'd rather not, I'm tied up with the mockups. Rahul, could you do it?
+Rahul: Fine, I'll take the budget summary.
+Priya Nair: Thanks. It's due end of next week.
+Karan: Wait, I think finance wants Priya S on that since she knows the numbers.
+Priya Nair: True. Priya S takes over the budget summary then. Rahul, you're off the hook.
+Rahul: Thanks!
+Priya Nair: About the vendor call, Monday doesn't work for the vendor. Let's make it Tuesday at 2pm.
+Karan: Tuesday at 2pm is fine with me.
+Priya Nair: Hmm, actually the vendor says Wednesday morning, 10am, is better.
+Priya Nair: Okay, final answer: the vendor call is Wednesday at 10am, with Karan and me.
+Ananya: Should we drop the accessibility audit?
+Priya Nair: Yes, drop it for now.
+Karan: Actually the client asked for it again. Let's keep the accessibility audit.
+Priya Nair: Okay, it's back on. Karan, you own it, due next Friday.
+Priya Nair: Last thing: Ananya, same deadline for the icon refresh as the audit.
+Ananya: Got it.

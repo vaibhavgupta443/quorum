@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quorum</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --ink: #1c2330; --muted: #657084; --line: #e3e7ee;
+    --accent: #3b5bdb; --accent-ink: #ffffff; --ok: #1f8f4e; --warn: #b7791f; --bad: #c53030;
+    --warn-bg: #fff6e0; --bad-bg: #fdeaea; --ok-bg: #e6f6ed; --chip: #eef1f8; --flash: #fff1a8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151c; --card: #1a1f2a; --ink: #e8ecf4; --muted: #9aa5b8; --line: #2b3342;
+      --accent: #7c97ff; --accent-ink: #0f1320; --ok: #4cc38a; --warn: #f0b24a; --bad: #ff7b7b;
+      --warn-bg: #33291a; --bad-bg: #3a2020; --ok-bg: #173325; --chip: #252c3b; --flash: #5b4a10;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--card); flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  header .spacer { flex: 1; }
+  main { max-width: 1320px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 16px; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+  .full { grid-column: 1 / -1; }
+  button { font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 7px 12px; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  input, select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; max-width: 100%; }
+  textarea { width: 100%; font: 13px/1.5 ui-monospace, Consolas, monospace; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  .chip { background: var(--chip); border-radius: 999px; padding: 3px 10px; font-size: 13px; }
+  .muted { color: var(--muted); }
+  #feed { list-style: none; padding: 0; margin: 12px 0 0; max-height: 200px; overflow: auto; font-size: 13px; }
+  #feed li { padding: 4px 0; border-bottom: 1px dashed var(--line); display: flex; gap: 8px; }
+  #feed li.err { color: var(--bad); }
+  #feed .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); margin-top: 7px; flex: none; }
+  #feed li.err .dot { background: var(--bad); }
+  #utts { max-height: 360px; overflow: auto; font-size: 13px; border: 1px solid var(--line); border-radius: 8px; }
+  .utt { padding: 4px 10px; border-bottom: 1px solid var(--line); display: flex; gap: 8px; }
+  .utt .n { color: var(--muted); min-width: 30px; }
+  .utt .who { font-weight: 600; white-space: nowrap; }
+  .utt.removed { background: var(--bad-bg); color: var(--bad); }
+  .utt.flash { animation: flash 1.6s ease-out; }
+  @keyframes flash { 0%, 60% { background: var(--flash); } 100% { background: transparent; } }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; padding: 4px 6px; }
+  td { padding: 6px; border-top: 1px solid var(--line); vertical-align: top; }
+  td input[type=text] { width: 100%; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; }
+  .badge.skip { background: var(--chip); color: var(--muted); }
+  .badge.ok { background: var(--ok-bg); color: var(--ok); }
+  .badge.tent { background: var(--warn-bg); color: var(--warn); margin-left: 6px; }
+  .note { background: var(--warn-bg); color: var(--warn); border-radius: 8px; padding: 8px 10px; margin: 6px 0; font-size: 13px; }
+  .note.bad { background: var(--bad-bg); color: var(--bad); }
+  .hist { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .ev { display: inline-block; font-size: 12px; background: var(--chip); border-radius: 6px; padding: 0 6px; margin: 2px 3px 0 0; cursor: pointer; color: var(--accent); }
+  .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+  .tabs button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  tr.new td { background: var(--ok-bg); }
+  .empty { color: var(--muted); padding: 20px 0; text-align: center; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Quorum</h1>
+  <span class="sub">meeting transcript &rarr; who owns what, by when &rarr; tasks, events, recap</span>
+  <span class="spacer"></span>
+  <span class="chip" id="backends"></span>
+  <span class="chip" id="today"></span>
+  <span class="chip" id="model"></span>
+  <button id="reset" title="Restore the demo workspace data">Reset demo data</button>
+</header>
+
+<div id="keywarn" class="note bad" style="display:none; max-width:1320px; margin:12px auto 0"></div>
+<main>
+  <section class="card">
+    <h2>1. Give it a meeting transcript</h2>
+    <div class="muted" style="font-size:13px">Try a sample (runs immediately):</div>
+    <div class="row" id="samples" style="margin-top:4px"></div>
+    <textarea id="transcript" rows="9" style="margin-top:10px" placeholder="Paste a transcript here, one line per utterance, like:&#10;[00:01:10] Priya: Karan, can you write the API docs?&#10;[00:01:35] Priya: Actually, Rahul, take the docs instead."></textarea>
+    <div class="row">
+      <input type="file" id="file" accept=".txt,.vtt,.srt,text/plain">
+      <input type="text" id="title" placeholder="Meeting title (optional)" style="flex:1; min-width:130px">
+      <label class="muted" style="font-size:13px">meeting date <input type="date" id="mdate"></label>
+    </div>
+    <div class="row">
+      <button class="primary" id="analyze">Analyze</button>
+      <label class="muted" style="font-size:13px" title="Fast: one model call, then code does the rest (seconds). Agent: the model also runs a tool-calling loop (slower, more tokens).">
+        <input type="checkbox" id="agentmode"> agent mode (slower)
+      </label>
+    </div>
+    <h2 style="margin-top:16px">What is happening</h2>
+    <ul id="feed"><li class="muted">Nothing yet.</li></ul>
+    <h2 style="margin-top:16px">Transcript <span class="muted" style="text-transform:none; letter-spacing:0">(click a #number in the plan to jump here)</span></h2>
+    <div id="utts"><div class="empty">No transcript yet.</div></div>
+  </section>
+
+  <section class="card">
+    <h2>2. Review the plan (nothing is created until you approve)</h2>
+    <div id="plan"><div class="empty">The plan will appear here.</div></div>
+  </section>
+
+  <section class="card full">
+    <h2>Workspace (the data behind the MCP server)</h2>
+    <div class="tabs" id="tabs"></div>
+    <div id="workspace"></div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const linkify = (html) => html.replace(/(https?:\/\/[^\s)<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');  // input is already HTML-escaped
+let state = null, plan = null, sessionId = null, tab = "tasks", fresh = {};
+
+async function api(path, options) {
+  const res = await fetch(path, options);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : res.statusText);
+  return data;
+}
+const post = (path, body) => api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+
+// ---------------------------------------------------------------- workspace panel
+function renderWorkspace() {
+  const tabs = ["tasks", "events", "drafts", "people"];
+  $("tabs").innerHTML = tabs.map((t) => `<button class="${t === tab ? "on" : ""}" data-t="${t}">${t} (${state[t].length})</button>`).join("");
+  document.querySelectorAll("#tabs button").forEach((b) => (b.onclick = () => { tab = b.dataset.t; renderWorkspace(); }));
+  const rows = state[tab];
+  const cols = { tasks: ["id", "title", "owner", "due", "priority"], events: ["title", "start", "end", "attendees"], drafts: ["id", "to_addrs", "subject", "body"], people: ["name", "email", "role"] }[tab];
+  if (!rows.length) { $("workspace").innerHTML = `<div class="empty">Nothing here yet.</div>`; return; }
+  const cell = (r, c) => {
+    const text = esc(Array.isArray(r[c]) ? r[c].join(", ") : r[c]);
+    const linked = (tab === "tasks" && c === "id") || (tab === "events" && c === "title");  // open the real Jira issue / Google event
+    return linked && r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">${text}</a>` : text;
+  };
+  $("workspace").innerHTML = `<div style="overflow:auto"><table><tr>${cols.map((c) => `<th>${c}</th>`).join("")}</tr>` +
+    rows.map((r) => `<tr class="${fresh[tab + r.id] ? "new" : ""}">${cols.map((c) => `<td>${cell(r, c)}</td>`).join("")}</tr>`).join("") + `</table></div>`;
+}
+
+async function loadState() {
+  state = await api("/api/state");
+  $("today").textContent = "today: " + state.today;
+  $("model").textContent = state.model_ready ? state.model : "model not ready";
+  const labels = { local: "demo data", jira: "Jira", google: "Google Calendar" };
+  $("backends").textContent = `tasks: ${labels[state.backends.tasks] || state.backends.tasks} | calendar: ${labels[state.backends.calendar] || state.backends.calendar}`;
+  const problem = state.model_problem || (state.problems || []).join("  |  ");
+  $("keywarn").textContent = problem;
+  $("keywarn").style.display = problem ? "block" : "none";
+  if (!$("mdate").value) $("mdate").value = state.today;
+  renderWorkspace();
+}
+
+// ---------------------------------------------------------------- transcript viewer
+function renderTranscript(utterances, removed) {
+  const gone = new Set((removed || []).map((r) => +(r.match(/^#(\d+)/) || [])[1]));
+  $("utts").innerHTML = utterances.map((u) => `<div class="utt ${gone.has(u.index) ? "removed" : ""}" id="u${u.index}">
+      <span class="n">#${u.index}</span><span class="who">${esc(u.speaker)}</span><span>${esc(u.text)}${gone.has(u.index) ? " <em>(removed: looks like an instruction to the AI)</em>" : ""}</span></div>`).join("");
+}
+function jumpTo(n) {
+  const el = $("u" + n);
+  if (!el) return;
+  el.scrollIntoView({ block: "center", behavior: "smooth" });
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+}
+
+// ---------------------------------------------------------------- live agent feed
+function addFeed(e) {
+  if (e.type === "note") {
+    if (e.utterances) renderTranscript(e.utterances, []);
+    if (e.removed) renderTranscript([...document.querySelectorAll(".utt")].map((d) => ({ index: +d.id.slice(1), speaker: d.querySelector(".who").textContent, text: d.lastChild.textContent })), e.removed);
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="dot"></span><span>${esc(e.text)}</span>`;
+    $("feed").appendChild(li);
+  } else if (e.type === "tool_call") {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="dot"></span><span>Agent mode: calling <b>${esc(e.tool)}</b> ${esc(JSON.stringify(e.input).slice(0, 90))}</span>`;
+    $("feed").appendChild(li);
+  } else if (e.is_error) {
+    const li = document.createElement("li");
+    li.className = "err";
+    li.innerHTML = `<span class="dot"></span><span>${esc(e.tool)} was rejected: ${esc(e.preview.slice(0, 140))}</span>`;
+    $("feed").appendChild(li);
+  }
+  $("feed").scrollTop = 1e6;
+}
+
+async function followJob(jobId) {
+  let since = 0;
+  while (true) {
+    const j = await api(`/api/job/${jobId}?since=${since}`);
+    j.events.forEach(addFeed);
+    since = j.next;
+    if (j.status === "done") return j.result;
+    if (j.status === "error") throw new Error(j.error);
+    await new Promise((r) => setTimeout(r, 400));
+  }
+}
+
+function track(promise) {
+  $("plan").innerHTML = `<div class="empty">Working... <strong id="elapsed">0.0 s</strong></div>`;
+  setBusy(true);
+  const t0 = Date.now();  // a live stopwatch so you can see how long a run takes
+  const timer = setInterval(() => { const el = $("elapsed"); if (el) el.textContent = ((Date.now() - t0) / 1000).toFixed(1) + " s"; }, 100);
+  return promise.then(showResult).catch((err) => { $("plan").innerHTML = `<div class="note bad">${esc(err.message)}</div>`; })
+    .finally(() => { clearInterval(timer); setBusy(false); });
+}
+function setBusy(b) { document.querySelectorAll("button.primary, #samples button").forEach((x) => (x.disabled = b)); }
+
+async function analyze() {
+  const transcript = $("transcript").value;
+  if (!transcript.trim()) { alert("Paste a transcript first, or click a sample."); return; }
+  $("feed").innerHTML = "";
+  $("utts").innerHTML = `<div class="empty">Reading...</div>`;
+  try {
+    const started = await post("/api/plan", { transcript, meeting_title: $("title").value, meeting_date: $("mdate").value, mode: $("agentmode").checked ? "agent" : "fast" });
+    sessionId = started.session_id;
+    await track(followJob(started.job_id));
+  } catch (e) { $("plan").innerHTML = `<div class="note bad">${esc(e.message)}</div>`; }
+}
+
+// ---------------------------------------------------------------- plan review (editable)
+function showResult(result) {
+  if (!result.plan) { $("plan").innerHTML = `<div class="note bad">No plan was produced (${esc(result.stop_reason)}). ${esc(result.text)}</div>`; return; }
+  plan = result.plan;
+  renderPlan(result);
+}
+
+function ownerSelect(idx, value) {
+  const names = state.people.map((p) => p.name);
+  return `<select data-k="task-owner" data-i="${idx}"><option value="">- choose -</option>` + names.map((n) => `<option ${n === value ? "selected" : ""}>${esc(n)}</option>`).join("") + `</select>`;
+}
+const evidence = (x) => (x.evidence || []).map((n) => `<span class="ev" onclick="jumpTo(${n})">#${n}</span>`).join("");
+const history = (x) => (x.history || []).map((h) => `<div class="hist">${esc(h)}</div>`).join("");
+const tentative = (x) => (x.tentative ? `<span class="badge tent">tentative: confirm</span>` : "");
+
+function renderPlan(result) {
+  const t = plan.tasks.map((x, i) => `
+    <tr>
+      <td><input type="text" data-k="task-title" data-i="${i}" value="${esc(x.title)}">${tentative(x)}
+        ${x.owner === null && x.question ? `<div class="note">${esc(x.question)}</div>` : ""}
+        ${history(x)}<div>${evidence(x)}</div></td>
+      <td>${x.action === "skip_duplicate" ? `<span class="badge skip">${esc(x.owner || "")}<br>already exists as #${esc(x.existing_task_id)}</span>` : ownerSelect(i, x.owner)}</td>
+      <td><input type="date" data-k="task-due" data-i="${i}" value="${esc(x.due || "")}"></td>
+      <td>${x.action === "skip_duplicate" ? `<span class="badge skip">will skip</span>` : `<span class="badge ok">create</span>`}</td>
+    </tr>`).join("");
+  const ev = plan.events.map((x, i) => `
+    <tr>
+      <td><input type="text" data-k="ev-title" data-i="${i}" value="${esc(x.title)}">${tentative(x)}
+        ${x.note ? `<div class="note">${esc(x.note)}</div>` : ""}${history(x)}<div>${evidence(x)}</div></td>
+      <td>${esc(x.attendees.join(", "))}</td>
+      <td><input type="datetime-local" data-k="ev-start" data-i="${i}" value="${esc(x.start)}"></td>
+      <td>${x.duration_minutes} min</td>
+    </tr>`).join("");
+  $("plan").innerHTML = `
+    <p><strong>${esc(plan.summary)}</strong></p>
+    ${plan.warnings.map((w) => `<div class="note">${esc(w)}</div>`).join("")}
+    <h2>Tasks</h2>
+    ${plan.tasks.length ? `<div style="overflow:auto"><table><tr><th>Task</th><th>Owner</th><th>Due</th><th></th></tr>${t}</table></div>` : `<div class="muted">No tasks found.</div>`}
+    <h2 style="margin-top:14px">Meetings</h2>
+    ${plan.events.length ? `<div style="overflow:auto"><table><tr><th>Meeting</th><th>Who</th><th>Start</th><th></th></tr>${ev}</table></div>` : `<div class="muted">No meetings found.</div>`}
+    ${plan.email ? `<h2 style="margin-top:14px">Recap email (written by code, never sent)</h2>
+      <div class="muted">To: ${esc(plan.email.to.join(", "))}</div>
+      <input type="text" data-k="mail-subject" value="${esc(plan.email.subject)}" style="width:100%; margin:6px 0">
+      <textarea data-k="mail-body" rows="7">${esc(plan.email.body)}</textarea>` : ""}
+    <div class="row" style="margin-top:14px">
+      <button class="primary" id="approve">Approve &amp; create</button>
+      <input type="text" id="instruction" placeholder='Ask for a change, e.g. "make the demo sync Thursday"' style="flex:1; min-width:180px">
+      <button id="refine">Update plan</button>
+    </div>
+    <div id="results"></div>
+    <div class="muted" style="margin-top:8px; font-size:12px">${result ? `<strong>Done in ${result.seconds} s</strong> (${result.mode} mode) &middot; ${result.usage.input_tokens.toLocaleString()} input / ${result.usage.output_tokens.toLocaleString()} output tokens` : ""}</div>`;
+  $("plan").querySelectorAll("[data-k]").forEach((el) => (el.onchange = el.oninput = () => edit(el)));
+  $("approve").onclick = approve;
+  $("refine").onclick = refine;
+}
+
+function edit(el) {  // keep the in-browser plan in sync with what the human typed or picked
+  const i = +el.dataset.i, k = el.dataset.k;
+  if (k === "task-title") plan.tasks[i].title = el.value;
+  if (k === "task-owner") { plan.tasks[i].owner = el.value || null; plan.tasks[i].question = el.value ? null : (plan.tasks[i].question || "Who should own this?"); }
+  if (k === "task-due") plan.tasks[i].due = el.value || null;
+  if (k === "ev-title") plan.events[i].title = el.value;
+  if (k === "ev-start") plan.events[i].start = el.value;
+  if (k === "mail-subject") plan.email.subject = el.value;
+  if (k === "mail-body") plan.email.body = el.value;
+}
+
+async function approve() {
+  $("approve").disabled = true;
+  try {
+    const out = await post("/api/execute", plan);
+    const before = state;
+    state = out.state;
+    fresh = {};
+    for (const key of ["tasks", "events", "drafts"]) {
+      const old = new Set(before[key].map((r) => r.id));
+      state[key].forEach((r) => { if (!old.has(r.id)) fresh[key + r.id] = true; });
+    }
+    $("results").innerHTML = out.results.map((r) => {
+      const good = ["created", "drafted"].includes(r.status);
+      return `<div class="note ${r.status === "failed" ? "bad" : ""}" ${good ? 'style="background:var(--ok-bg);color:var(--ok)"' : ""}><strong>${esc(r.status)}</strong> ${esc(r.kind)}: ${esc(r.title)}<br><span style="opacity:.85">${linkify(esc(r.detail))}</span></div>`;
+    }).join("");
+    renderWorkspace();
+  } catch (err) { $("results").innerHTML = `<div class="note bad">${esc(err.message)}</div>`; }
+  $("approve").disabled = false;
+}
+
+async function refine() {
+  const instruction = $("instruction").value.trim();
+  if (!instruction) return;
+  try {
+    const started = await post("/api/refine", { session_id: sessionId, instruction });
+    $("feed").innerHTML = "";
+    await track(followJob(started.job_id));
+  } catch (e) { $("plan").innerHTML = `<div class="note bad">${esc(e.message)}</div>`; }
+}
+
+// ---------------------------------------------------------------- wiring
+$("analyze").onclick = analyze;
+$("reset").onclick = async () => { state = { ...state, ...(await api("/api/reset", { method: "POST" })) }; fresh = {}; renderWorkspace(); };
+$("file").onchange = async (e) => {  // read a .txt/.vtt/.srt in the browser and put it in the box
+  const f = e.target.files[0];
+  if (f) { $("transcript").value = await f.text(); if (!$("title").value) $("title").value = f.name.replace(/\.[^.]+$/, ""); }
+};
+
+(async function init() {
+  await loadState();
+  const names = await api("/api/samples");
+  $("samples").innerHTML = names.map((n) => `<button data-n="${n}">${n.replace(/_/g, " ")}</button>`).join("");
+  document.querySelectorAll("#samples button").forEach((b) => (b.onclick = async () => {
+    const s = await api(`/api/sample/${b.dataset.n}`);
+    $("transcript").value = s.transcript;
+    $("title").value = s.title;
+    $("mdate").value = state.today;
+    analyze();
+  }));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+[
+  {"name": "Your Name", "email": "you@gmail.com", "role": "Engineer", "jira_account_id": null},
+  {"name": "Teammate One", "email": "teammate1@gmail.com", "role": "Designer"},
+  {"name": "Teammate Two", "email": "teammate2@gmail.com", "role": "QA"}
+]

@@ -1,0 +1,22 @@
+[00:00:05] Priya Nair: Okay, let's get started. Quick sprint sync, it's Tuesday the sixth.
+[00:00:20] Priya Nair: First, the auth middleware refactor. Rahul, can you take that by Friday?
+[00:00:31] Rahul: Sure, I'll do it by Friday.
+[00:01:10] Priya Nair: Next, the API documentation for the new endpoints. Karan, can you write those?
+[00:01:22] Karan: I'm buried with regression testing, to be honest.
+[00:01:35] Priya Nair: Okay then, Priya S, can you take the API docs instead?
+[00:01:41] Priya Sharma: Yes, I'll write the API docs. Monday works for me.
+[00:02:30] Ananya: I can start the onboarding mockups. Probably next Wednesday.
+[00:03:05] Priya Nair: We also need someone to update the release notes. Priya, can you take that?
+[00:03:20] Rahul: Which Priya?
+[00:03:25] Priya Nair: Let's sort that out after the call.
+[00:04:10] Karan: I'll run the regression tests before the release, by end of week.
+[00:04:40] Priya Nair: Karan, could you also check the terms of service page for the legal wording?
+[00:04:55] Karan: Sure.
+[00:05:00] Priya Nair: We need a demo prep sync. How about Thursday at 3pm with Rahul and Ananya?
+[00:05:12] Ananya: Thursday at 3 doesn't work for me. Can we do Friday at 11?
+[00:05:20] Priya Nair: Fine, let's move it to Friday at 11am.
+[00:07:40] Rahul: Actually, on the auth refactor, I'll be out Thursday. I'll still do it, but make it next Monday instead of Friday.
+[00:08:30] Priya Nair: Maybe we should redo the settings page at some point. Just an idea.
+[00:09:15] Priya Nair: Scratch the terms of service check, legal already did it.
+[00:09:50] Priya Nair: Just to confirm, the demo prep sync is Friday at 11 with Rahul and Ananya. Also, a full team sprint review next Tuesday at 11.
+[00:10:30] Priya Nair: That's it, thanks everyone.

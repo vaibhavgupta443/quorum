@@ -1,0 +1,6 @@
+Rahul: Yesterday I finished the login redirect bug. Today I'll start the dark mode toggle, should be done by Thursday.
+Ananya: I'll finish the icon set by tomorrow.
+Karan: I'm going to write the test plan for the checkout flow, due next Monday.
+Priya Sharma: I need to look at the slow search query. I'll have a fix by Friday.
+Priya Nair: Great. I'll set up a stakeholder demo on Wednesday at 2pm with everyone.
+Priya Nair: Thanks all.
