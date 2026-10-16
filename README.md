@@ -100,25 +100,4 @@ The planner and MCP tools don't change; only `app/backends.py` knows the differe
 python -m evals.run_evals --trials 3     # 4 sample transcripts, graded against samples\cases.json
 set BOARDBOT_MODEL=openai/gpt-oss-20b & python -m evals.run_evals    # compare a smaller model
 ```
-Measured with Groq `openai/gpt-oss-120b`, fast mode: first run 7/8 (a reassignment was attributed to the speaker instead
-of the person addressed, which also made the duplicate check miss). I tightened the extraction prompt, and the next run
-passed 11/11 before Groq's free-tier rate limit stopped the last trial. Treat that as "good, not proven": it is 4
-transcripts, a few trials each. The grader checks final owners, changed due dates, one-event-per-meeting, dropped items,
-ideas, ambiguity, duplicates, invented tasks, and that an injected instruction was not obeyed or leaked.
 
-## What to read next
-
-**[STUDY_GUIDE.md](STUDY_GUIDE.md)** (5-day plan with self-test questions, a question bank, a demo script and resume bullets)
-and **[DAY1.md](DAY1.md)** (start here if you are a complete beginner).
-
-## Honest limitations
-
-- The pipeline and the Groq model were run live on the four sample transcripts (numbers above). **Jira and Google
-  Calendar are tested with mocks only, not against your accounts**; try them once before a demo.
-- Model output varies between runs. The prompt rules and the replay step make it much steadier, but a free-tier model can
-  still occasionally miss a side task or mis-attribute an owner. The plan screen shows the evidence so a human can catch it.
-- The sample transcripts are written by hand. Real auto-generated transcripts (Zoom, Meet, Teams: `.txt`/`.vtt`/`.srt`) are
-  parsed, but have not been tested at length; very long meetings (over about 200,000 characters) are refused.
-- Name matching is against the small team list in `app/db.py` or your `team.json`.
-- The workspace is SQLite pretending to be Jira/Calendar/Gmail unless you connect the real ones.
-- No authentication or multi-user support; it's a learning/demo project.
